@@ -1,16 +1,26 @@
 import json
 import os
-from flask import Flask, jsonify, request
 # import du module mysql.connector
 from mysql.connector import connect, DatabaseError, InterfaceError
+from django.urls import path
 
 
-app = Flask(__name__)
+# views.py
+from . import views
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from .models import Item, Move, Pokemon
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+# from rest_framework_jwt.settings import api_settings
 
 USER = "root1"
 PWD = ""
 HOST = "localhost"
-DATABASE = "cours1"
+DATABASE = "pokedex"
 
 
 # connexion à une base MySql [dbpersonnes]
@@ -34,17 +44,26 @@ finally:
         connexion.close()
 
 
-user = [ { 'userID': 1, 'username': 'Ashley', 'email' : 'toto@tonpere.com', 'password' : 'papa', 'create_time' : 2022-2-25 }]
 
 
-@app.route('/user', methods=['GET'])
-def get_user():
-    return jsonify(user), 201
 
-@app.route('/user', methods=['DELETE'])
-def delete_user():
-    
-    return jsonify("tutu!!!!"), 201
+urlpatterns = [
+    path('api/items/<int:item_id>/', views.get_item, name='get_item'),
+    path('api/moves/<int:move_id>/', views.get_move, name='get_move'),
+    path('api/pokemon/<int:pk>/', views.get_pokemon_by_id, name='get_pokemon_by_id'),
+    path('api/pokemon/<str:name>/', views.get_pokemon_by_name, name='get_pokemon_by_name'),
+    path('api/pokemon/types/<str:pokemon_type>/', views.get_pokemon_by_type, name='get_pokemon_by_type'),
+    path('api/connexion/', views.connect_user, name='connect_user'),
+    path('api/register/', views.register_user, name='register_user'),
+    path('api/mesPokemons/', views.get_user_pokemons, name='get_user_pokemons'),
+    path('api/role/', views.get_user_role, name='get_user_role'),
+    path('api/admin/users/', views.get_admin_users, name='get_admin_users'),
+]
 
-if __name__ == "__main__":
-    app.run(debug=True)
+
+@api_view(['GET'])
+def get_item(request,item_id):
+    item = Item.objects.get(id=item_id)
+    data = { 'id': item.id, 'name': item.name}
+    return JsonResponse, 201
+
