@@ -1,47 +1,28 @@
 import json
 import os
+import django
+
+from django.conf import settings
 # import du module mysql.connector
-from mysql.connector import connect, DatabaseError, InterfaceError
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'API-DJANGO.settings')
+django.setup()
+
+from django.contrib.auth.models import User
 from django.urls import path
 
 
 # views.py
-from . import views
+import views
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from .models import Item, Move, Pokemon
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 # from rest_framework_jwt.settings import api_settings
 
-USER = "root1"
-PWD = ""
-HOST = "localhost"
-DATABASE = "pokedex"
-
-
-# connexion à une base MySql [dbpersonnes]
-# l'identité de l'utilisateur est (admpersonnes,nobody)
-
-# c'est parti
-connexion = None
-try:
-    print("Connexion au SGBD MySQL en cours...")
-    # connexion
-    connexion = connect(host=HOST, user=USER, password=PWD, database=DATABASE)
-    # suivi
-    print(
-        f"Connexion MySQL réussie à la base database={DATABASE}, host={HOST} sous l'identité user={USER}, passwd={PWD}")
-except (InterfaceError, DatabaseError) as erreur:
-    # on affiche l'erreur
-    print(f"L'erreur suivante s'est produite : {erreur}")
-finally:
-    # on ferme la connexion si elle a été ouverte
-    if connexion:
-        connexion.close()
 
 
 
