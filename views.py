@@ -158,6 +158,7 @@ def get_pokemon_move(request, pokemon_move_id):
         return JsonResponse({'error': 'Pokemon move not found'}, status=404)
 
 def get_pokemon_form_generation(request, pokemon_form_generation_id):
+
     try:
         pokemon_form_generation = pokemon_form_generations.objects.get(id=pokemon_form_generation_id)
         data = {
@@ -168,3 +169,85 @@ def get_pokemon_form_generation(request, pokemon_form_generation_id):
         return JsonResponse(data)
     except pokemon_form_generations.DoesNotExist:
         return JsonResponse({'error': 'Pokemon form generation not found'}, status=404)
+    
+
+def get_pokemon_by_id(request, pk):
+    try:
+        pokemon = pokemon.objects.get(id=pk)
+        data = {
+            'id': pokemon.id,
+            'identifier': pokemon.identifier,
+            'species_id': pokemon.species_id,
+            'height': pokemon.height,
+            'weight': pokemon.weight,
+            'base_experience': pokemon.base_experience,
+            'order': pokemon.order,
+            'is_default': pokemon.is_default
+        }
+        return JsonResponse(data)
+    except pokemon.DoesNotExist:
+        return JsonResponse({'error': 'Pokemon not found'}, status=404)
+
+def get_pokemon_by_name(request, name):
+    try:
+        pokemon = pokemon.objects.get(identifier=name)
+        data = {
+            'id': pokemon.id,
+            'identifier': pokemon.identifier,
+            'species_id': pokemon.species_id,
+            'height': pokemon.height,
+            'weight': pokemon.weight,
+            'base_experience': pokemon.base_experience,
+            'order': pokemon.order,
+            'is_default': pokemon.is_default
+        }
+        return JsonResponse(data)
+    except pokemon.DoesNotExist:
+        return JsonResponse({'error': 'Pokemon not found'}, status=404)
+
+def get_pokemon_by_type(request, pokemon_type):
+    try:
+        pokemon_type_obj = pokemon_types.objects.filter(type_id__identifier=pokemon_type)
+        pokemon_list = []
+        for obj in pokemon_type_obj:
+            pokemon = {
+                'pokemon_id': obj.pokemon_id,
+                'type_id': obj.type_id.id,
+                'slot': obj.slot
+            }
+            pokemon_list.append(pokemon)
+        return JsonResponse({'pokemon_list': pokemon_list})
+    except pokemon_types.DoesNotExist:
+        return JsonResponse({'error': 'Pokemon type not found'}, status=404)
+
+def connect_user(request):
+    # Votre logique de connexion utilisateur ici
+    return JsonResponse({'message': 'User connected'})
+
+def register_user(request):
+    # Votre logique d'enregistrement utilisateur ici
+    return JsonResponse({'message': 'User registered'})
+
+def get_user_pokemons(request):
+    # Votre logique pour obtenir les Pokémon de l'utilisateur ici
+    # Par exemple, récupérer les Pokémon associés à l'utilisateur actuellement connecté
+    user = request.user
+    user_pokemons = pokemon.objects.filter(owner=user)
+    pokemon_list = [{'id': pokemon.id, 'name': pokemon.name} for pokemon in user_pokemons]
+    return JsonResponse({'pokemons': pokemon_list})
+
+def get_user_role(request):
+    # Votre logique pour obtenir le rôle de l'utilisateur ici
+    # Par exemple, récupérer le rôle de l'utilisateur actuellement connecté
+    user = request.user
+    if user.is_authenticated:
+        role = 'admin' if user.is_staff else 'user'
+        return JsonResponse({'role': role})
+    else:
+        return JsonResponse({'error': 'User not authenticated'}, status=401)
+
+""" def get_admin_users(request):
+    # Votre logique pour obtenir les utilisateurs admin ici
+    admin_users = users.objects.filter(is_staff=True)
+    admin_user_list = [{'id': user.id, 'username': user.username} for user in admin_users]
+    return JsonResponse({'admin_users': admin_user_list}) """

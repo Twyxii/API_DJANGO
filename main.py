@@ -39,7 +39,13 @@ urlpatterns = [
     path('api/mesPokemons/', views.get_user_pokemons, name='get_user_pokemons'),
     path('api/role/', views.get_user_role, name='get_user_role'),
     path('api/admin/users/', views.get_admin_users, name='get_admin_users'),
+
+    # Ajout des nouveaux endpoints
+    path('api/locations/<int:location_id>/', views.get_location, name='get_location'),
+    path('api/pokemon_moves/<int:pokemon_move_id>/', views.get_pokemon_move, name='get_pokemon_move'),
+    path('api/pokemon_form_generations/<int:pokemon_form_generation_id>/', views.get_pokemon_form_generation, name='get_pokemon_form_generation'),
 ]
+
 
 
 @api_view(['GET'])
