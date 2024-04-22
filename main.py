@@ -18,7 +18,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
-from .models import Item, Move, Pokemon
+from .models import *
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 # from rest_framework_jwt.settings import api_settings
@@ -44,7 +44,7 @@ urlpatterns = [
 
 @api_view(['GET'])
 def get_item(request,item_id):
-    item = Item.objects.get(id=item_id)
+    item = items.objects.get(id=item_id)
     data = { 'id': item.id, 'name': item.name}
     return JsonResponse, 201
 
