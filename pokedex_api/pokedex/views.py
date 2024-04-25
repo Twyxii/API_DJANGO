@@ -10,6 +10,10 @@ from .models import *
 def get_item(request, item_id):
     try:
         item = items.objects.get(id=item_id)
+    except items.DoesNotExist:
+        return JsonResponse({'message': 'Item does not exist'}, status=404)
+    
+    if request.method == 'GET':
         data = {
             'id': item.id,
             'identifier': item.identifier,
@@ -19,12 +23,35 @@ def get_item(request, item_id):
             'fling_effect_id': item.fling_effect_id
         }
         return JsonResponse(data)
-    except items.DoesNotExist:
-        return JsonResponse({'error': 'Item not found'}, status=404)
+
+    elif request.method == 'POST':
+        data_post = request.data
+        # Créer un nouvel objet item avec les données postées
+        new_item = items.objects.create(
+            identifier=data_post['identifier'],
+            category_id=data_post['category_id'],
+            cost=data_post['cost'],
+            fling_power=data_post.get('fling_power', None),
+            fling_effect_id=data_post.get('fling_effect_id', None),
+        )
+        return JsonResponse({'message': 'Item ajouter', 'id': new_item.id}, status=201)
+
+    elif request.method == 'DELETE':
+        # Logique pour traiter la requête DELETE
+        item.delete()
+        return JsonResponse({'message': 'Item deleted'}, status=204)
+
+    else:
+        return JsonResponse({'message': 'Unsupported method'}, status=405)
+
 
 def get_move(request, move_id):
     try:
         move = moves.objects.get(id=move_id)
+    except moves.DoesNotExist:
+        return JsonResponse({'error': 'Move not found'}, status=404)
+    if request.method == 'GET':
+
         data = {   
             'id': move.id,
             'identifier': move.identifier,
@@ -43,8 +70,36 @@ def get_move(request, move_id):
             'super_contest_effect_id': move.super_contest_effect_id      
         }
         return JsonResponse(data)
-    except moves.DoesNotExist:
-        return JsonResponse({'error': 'Move not found'}, status=404)
+    
+    elif request.method == 'POST': 
+        data.post = request.data
+        new_item = items.objects.create(
+            identifier=data.post['identifier'],
+            generation_id=data.post['generation_id'],
+            type_id=data.post['type_id'],
+            power=data.post['power'],
+            pp=data.post['pp'],
+            accuracy=data.post['accuracy'],
+            priority=data.post['priority'],
+            target_id=data.post['target_id'],
+            damage_class_id=data.post['damage_class_id'],
+            effect_id=data.post['effect_id'],
+            effect_chance=data.post['effect_chance'],
+            contest_type_id=data.post.get('contest_type_id', None),
+            contest_effect_id=data.post.get('contest_effect_id', None),
+            super_contest_effect_id=data.post.get('super_contest_effect_id', None)
+        )
+        return JsonResponse({'message': 'move added', 'id': new_item.id}, status=201)
+
+    elif request.method == 'DELETE':
+        
+        move.delete()
+        return JsonResponse({'message': 'Move deleted'}, status=204)
+
+    else:
+        return JsonResponse({'message': 'Unsupported method'}, status=405)
+
+    
 
 def get_pokemon(request, pokemon_id):
     try:
